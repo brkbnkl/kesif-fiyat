@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Keşif Fiyat Hesaplama</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f4f8; color: #1a202c; padding-bottom: 72px; }
+
+  header { background: #2b6cb0; color: white; padding: 12px 16px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+  header h1 { font-size: 17px; font-weight: 700; margin-bottom: 10px; text-align: center; }
+  .tabs { display: flex; gap: 4px; }
+  .tab-btn { flex: 1; padding: 9px; border: none; border-radius: 8px 8px 0 0; font-size: 13px; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.75); transition: all 0.15s; }
+  .tab-btn.active { background: #f0f4f8; color: #2b6cb0; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .container { padding: 12px; max-width: 700px; margin: 0 auto; }
+
+  /* --- HESAP TAB --- */
+  .card { background: white; border-radius: 12px; padding: 14px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .card-title { font-size: 12px; font-weight: 700; color: #718096; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+
+  .item-row { border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 10px 10px 38px; margin-bottom: 8px; background: #fafafa; position: relative; }
+  .item-row.has-value { background: #ebf8ff; border-color: #bee3f8; }
+  .row-number { position: absolute; top: 10px; left: 10px; width: 22px; height: 22px; background: #2b6cb0; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+  .row-label { font-size: 12px; font-weight: 700; color: #2d3748; margin-bottom: 6px; }
+
+  .field-group { display: flex; gap: 6px; margin-bottom: 6px; }
+  .field-group:last-child { margin-bottom: 0; }
+  select, input[type=number] { border: 1px solid #cbd5e0; border-radius: 8px; padding: 8px 10px; font-size: 13px; width: 100%; background: white; -webkit-appearance: none; }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath fill='%234a5568' d='M5 7L0 0h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; padding-right: 24px; }
+  select:focus, input:focus { outline: none; border-color: #3182ce; }
+  select:disabled { background-color: #f7fafc; color: #a0aec0; }
+  .field-tip { flex: 1; }
+  .field-adet { flex: 0 0 65px; }
+
+  .price-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-top: 4px; }
+  .price-label { color: #718096; }
+  .price-value { font-weight: 700; color: #2d3748; }
+  .price-value.zero { color: #cbd5e0; }
+
+  .delete-btn { position: absolute; top: 8px; right: 8px; background: none; border: none; color: #fc8181; font-size: 17px; cursor: pointer; padding: 2px 5px; line-height: 1; border-radius: 4px; }
+
+  .add-btn { width: 100%; background: #ebf8ff; border: 2px dashed #63b3ed; color: #2b6cb0; border-radius: 10px; padding: 11px; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+  /* sticky total */
+  .sticky-total { position: fixed; bottom: 0; left: 0; right: 0; background: #2b6cb0; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.15); z-index: 99; }
+  .sticky-total .st-label { font-size: 13px; opacity: 0.85; }
+  .sticky-total .st-amount { font-size: 22px; font-weight: 800; }
+
+  .reset-btn { width: 100%; background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; border-radius: 10px; padding: 11px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 4px; }
+
+  /* --- FİYATLAR TAB --- */
+  .price-group { background: white; border-radius: 12px; margin-bottom: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .price-group-header { background: #ebf8ff; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; }
+  .price-group-name { font-size: 13px; font-weight: 700; color: #2b6cb0; }
+  .add-type-btn { background: #2b6cb0; color: white; border: none; border-radius: 6px; padding: 5px 10px; font-size: 11px; font-weight: 600; cursor: pointer; }
+
+  .price-item { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-top: 1px solid #f0f4f8; }
+  .price-item-name { flex: 1; font-size: 13px; color: #4a5568; }
+  .price-item-input { width: 100px; border: 1px solid #cbd5e0; border-radius: 6px; padding: 6px 8px; font-size: 13px; text-align: right; }
+  .price-item-lira { font-size: 12px; color: #718096; }
+  .price-item-del { background: none; border: none; color: #fc8181; font-size: 16px; cursor: pointer; padding: 2px 4px; }
+
+  .add-product-card { background: white; border-radius: 12px; padding: 14px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .add-product-card h3 { font-size: 13px; font-weight: 700; color: #4a5568; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .add-product-card input[type=text] { border: 1px solid #cbd5e0; border-radius: 8px; padding: 9px 10px; font-size: 13px; width: 100%; background: white; margin-bottom: 8px; }
+  .add-product-card input[type=text]:focus { outline: none; border-color: #3182ce; }
+  .save-btn { width: 100%; background: #2b6cb0; color: white; border: none; border-radius: 10px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .save-btn:active { background: #2c5282; }
+
+  .info-note { font-size: 11px; color: #a0aec0; text-align: center; padding: 6px 0 10px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Keşif Fiyat Hesaplama</h1>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('hesap', this)">📋 Hesap</button>
+    <button class="tab-btn" onclick="switchTab('fiyatlar', this)">⚙️ Fiyatlar</button>
+  </div>
+</header>
+
+<!-- TAB 1: HESAP -->
+<div id="tab-hesap" class="tab-content active">
+  <div class="container">
+    <div class="card">
+      <div class="card-title">Sipariş Kalemleri</div>
+      <div id="itemsList"></div>
+      <button class="add-btn" onclick="addRow()">+ Kalem Ekle</button>
+    </div>
+    <button class="reset-btn" onclick="resetAll()">Formu Sıfırla</button>
+  </div>
+</div>
+
+<!-- TAB 2: FİYATLAR -->
+<div id="tab-fiyatlar" class="tab-content">
+  <div class="container">
+    <p class="info-note">Fiyatları düzenleyin veya yeni ürün ekleyin. Değişiklikler otomatik kaydedilir.</p>
+    <div id="priceEditor"></div>
+
+    <div class="add-product-card">
+      <h3>Yeni Ürün / Tip Ekle</h3>
+      <input type="text" id="newProduct" placeholder="Ürün adı (örn: KOMBİ)" style="text-transform:uppercase;">
+      <input type="text" id="newType" placeholder="Tip (örn: BOSCH_24kW)" style="text-transform:uppercase;">
+      <input type="number" id="newPrice" placeholder="Fiyat (₺)" min="0">
+      <br><br>
+      <button class="save-btn" onclick="addNewItem()">Ekle ve Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<div class="sticky-total" id="stickyTotal" style="display:none;">
+  <span class="st-label">Toplam Tutar</span>
+  <span class="st-amount" id="rawTotal">0 ₺</span>
+</div>
+
+<script>
+const DEFAULT_PRICES = {
+  "BACA DİRSEĞİ":       { "90 DERECE": 1000, "45 DERECE": 1000, "YOK": 0 },
+  "BACA UZATMASI":       { "1 METRE": 1000, "50 CM": 750, "YOK": 0 },
+  "CAM MENFEZ":          { "VAR": 250, "YOK": 0 },
+  "DOĞALGAZ TESİSATI":   { "ÇELİK_BORU": 4000, "ESNEK_BORU": 8000 },
+  "ELEKTİRİK TESİSATI":  { "VAR": 250, "YOK": 0 },
+  "EXTRA İŞÇİLİK":       { "VAR": 1000, "YOK": 0 },
+  "FİRMA GİDERİ":        { "VAR": 1000, "YOK": 0 },
+  "HAVLUPAN":            { "BEYAZ": 750, "KROM": 750 },
+  "İŞÇİLİK":             { "KOMPLE": 7000, "MONTAJ": 5000, "KOMBİ + GAZ": 4000 },
+  "KALORİFER TESİSATI":  { "KOMPLE": 5000, "ÖTELEME": 2500, "HAZIR": 0 },
+  "KOMBİ": {
+    "AİRFELL_MAESTRO_OPTİMUM_20kW": 22000,
+    "AİRFELL_MAESTRO_OPTİMUM_23kW": 24000,
+    "BOSCH_CONDENCE1200İ_20kW": 25500,
+    "BOSCH_CONDENCE2200İ_20kW": 27000,
+    "BOSCH_CONDENCE1200İ_24kW": 27000,
+    "ECA_CİTİUS_24kW": 25000,
+    "ECA_PROTEUS_PREMİX_24kW": 30000
+  },
+  "KOMBİ DOLABI":        { "VAR": 1000, "YOK": 0 },
+  "ODA TERMOSTATI": {
+    "AİRFELL_KABLOSUZ_TERMOSTAT": 1000,
+    "BOSCH_KABLOSUZ_TERMOSTAT": 1500,
+    "ECA_KABLOSUZ_TERMOSTAT": 1500,
+    "YOK": 0
+  },
+  "RADYATÖR":            { "ECA": 2250, "WARMHAUS": 1850 },
+  "RADYATÖR VANASI":     { "KALDE": 105, "ECA": 190 }
+};
+
+// 1. sayfadaki sıra (müşteri hesap tablosundaki sıra)
+const DEFAULT_ORDER = [
+  "KOMBİ",
+  "KALORİFER TESİSATI",
+  "DOĞALGAZ TESİSATI",
+  "RADYATÖR",
+  "RADYATÖR VANASI",
+  "ODA TERMOSTATI",
+  "KOMBİ DOLABI",
+  "HAVLUPAN",
+  "BACA UZATMASI",
+  "BACA DİRSEĞİ",
+  "CAM MENFEZ",
+  "ELEKTİRİK TESİSATI",
+  "İŞÇİLİK",
+  "FİRMA GİDERİ",
+  "EXTRA İŞÇİLİK"
+];
+
+function loadPrices() {
+  try {
+    const saved = localStorage.getItem('kesifFiyatlar');
+    return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_PRICES));
+  } catch(e) { return JSON.parse(JSON.stringify(DEFAULT_PRICES)); }
+}
+
+function savePrices() {
+  localStorage.setItem('kesifFiyatlar', JSON.stringify(PRICE_DB));
+}
+
+let PRICE_DB = loadPrices();
+let rowCounter = 0;
+
+// ===== TAB SWITCH =====
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  document.getElementById('stickyTotal').style.display = name === 'hesap' ? 'flex' : 'none';
+  if (name === 'fiyatlar') renderPriceEditor();
+}
+
+// ===== HESAP TAB =====
+function addRow(productName) {
+  rowCounter++;
+  const id = rowCounter;
+  const list = document.getElementById('itemsList');
+  const div = document.createElement('div');
+  div.className = 'item-row';
+  div.id = 'row-' + id;
+
+  const products = Object.keys(PRICE_DB).sort();
+  const productOpts = products.map(p =>
+    `<option value="${p}" ${p === productName ? 'selected' : ''}>${p}</option>`
+  ).join('');
+
+  div.innerHTML = `
+    <span class="row-number">${id}</span>
+    <button class="delete-btn" onclick="deleteRow(${id})">×</button>
+    ${productName ? `<div class="row-label">${productName}</div>` : ''}
+    <div class="field-group">
+      ${!productName ? `<select onchange="onProductChange(${id})" id="siparis-${id}">
+        <option value="">-- Ürün Seç --</option>
+        ${productOpts}
+      </select>` : `<input type="hidden" id="siparis-${id}" value="${productName}">`}
+      <div class="field-tip">
+        <select id="tip-${id}" onchange="calcRow(${id})" ${productName ? '' : 'disabled'}>
+          <option value="">-- Tip --</option>
+        </select>
+      </div>
+      <div class="field-adet">
+        <input type="number" id="adet-${id}" value="1" min="0" step="1" oninput="calcRow(${id})" placeholder="Adet">
+      </div>
+    </div>
+    <div class="price-row">
+      <span class="price-label">Birim: <span id="birim-${id}">-</span></span>
+      <span class="price-value zero" id="total-${id}">0 ₺</span>
+    </div>
+  `;
+  list.appendChild(div);
+
+  if (productName) populateTips(id, productName);
+}
+
+function onProductChange(id) {
+  const product = document.getElementById('siparis-' + id).value;
+  const label = document.querySelector('#row-' + id + ' .row-label');
+  if (label) label.textContent = product;
+  populateTips(id, product);
+  calcRow(id);
+}
+
+function populateTips(id, product) {
+  const tipSel = document.getElementById('tip-' + id);
+  tipSel.innerHTML = '<option value="">-- Tip --</option>';
+  if (product && PRICE_DB[product]) {
+    Object.keys(PRICE_DB[product]).forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t;
+      opt.textContent = t.replace(/_/g, ' ');
+      tipSel.appendChild(opt);
+    });
+    tipSel.disabled = false;
+  } else {
+    tipSel.disabled = true;
+  }
+}
+
+function calcRow(id) {
+  const sipEl = document.getElementById('siparis-' + id);
+  const product = sipEl ? sipEl.value : '';
+  const tip = document.getElementById('tip-' + id).value;
+  const adet = parseFloat(document.getElementById('adet-' + id).value) || 0;
+
+  let birim = 0;
+  if (product && tip && PRICE_DB[product] && PRICE_DB[product][tip] !== undefined) {
+    birim = PRICE_DB[product][tip];
+  }
+
+  const total = birim * adet;
+  document.getElementById('birim-' + id).textContent =
+    (birim > 0 || (birim === 0 && tip)) ? formatMoney(birim) + ' ₺' : '-';
+  const totalEl = document.getElementById('total-' + id);
+  totalEl.textContent = formatMoney(total) + ' ₺';
+  totalEl.className = 'price-value' + (total === 0 ? ' zero' : '');
+  document.getElementById('row-' + id).className = 'item-row' + (total > 0 ? ' has-value' : '');
+
+  updateTotal();
+}
+
+function deleteRow(id) {
+  const row = document.getElementById('row-' + id);
+  if (row) row.remove();
+  updateTotal();
+}
+
+function updateTotal() {
+  let total = 0;
+  document.querySelectorAll('[id^="total-"]').forEach(el => {
+    total += parseFloat(el.textContent.replace(/[^\d]/g, '')) || 0;
+  });
+  document.getElementById('rawTotal').textContent = formatMoney(total) + ' ₺';
+}
+
+function resetAll() {
+  if (confirm('Tüm kalemleri sıfırlamak istediğinize emin misiniz?')) {
+    document.getElementById('itemsList').innerHTML = '';
+    rowCounter = 0;
+    loadDefaultRows();
+    updateTotal();
+  }
+}
+
+function loadDefaultRows() {
+  DEFAULT_ORDER.forEach(p => addRow(p));
+}
+
+function formatMoney(n) {
+  return Math.round(n).toLocaleString('tr-TR');
+}
+
+// ===== FİYATLAR TAB =====
+function renderPriceEditor() {
+  const container = document.getElementById('priceEditor');
+  container.innerHTML = '';
+  Object.keys(PRICE_DB).sort().forEach(product => {
+    const group = document.createElement('div');
+    group.className = 'price-group';
+    const types = PRICE_DB[product];
+    const rows = Object.keys(types).map(tip => `
+      <div class="price-item" id="pi-${esc(product)}-${esc(tip)}">
+        <span class="price-item-name">${tip.replace(/_/g, ' ')}</span>
+        <input class="price-item-input" type="number" min="0"
+          value="${types[tip]}"
+          onchange="updatePrice('${esc(product)}','${esc(tip)}',this.value)">
+        <span class="price-item-lira">₺</span>
+        <button class="price-item-del" onclick="deleteType('${esc(product)}','${esc(tip)}')">×</button>
+      </div>
+    `).join('');
+    group.innerHTML = `
+      <div class="price-group-header">
+        <span class="price-group-name">${product}</span>
+        <button class="add-type-btn" onclick="addTypeToProduct('${esc(product)}')">+ Tip Ekle</button>
+      </div>
+      ${rows}
+    `;
+    container.appendChild(group);
+  });
+}
+
+function esc(s) { return s.replace(/'/g, "\\'"); }
+
+function updatePrice(product, tip, val) {
+  if (!PRICE_DB[product]) return;
+  PRICE_DB[product][tip] = parseFloat(val) || 0;
+  savePrices();
+  refreshAllTipSelects();
+}
+
+function deleteType(product, tip) {
+  if (!confirm(`"${product} - ${tip}" silinsin mi?`)) return;
+  delete PRICE_DB[product][tip];
+  if (Object.keys(PRICE_DB[product]).length === 0) delete PRICE_DB[product];
+  savePrices();
+  renderPriceEditor();
+  refreshAllTipSelects();
+}
+
+function addTypeToProduct(product) {
+  const tip = prompt(`"${product}" için yeni tip adı:`, '');
+  if (!tip || !tip.trim()) return;
+  const fiyat = parseFloat(prompt('Fiyatı (₺):', '0')) || 0;
+  if (!PRICE_DB[product]) PRICE_DB[product] = {};
+  PRICE_DB[product][tip.trim().toUpperCase()] = fiyat;
+  savePrices();
+  renderPriceEditor();
+  refreshAllTipSelects();
+}
+
+function addNewItem() {
+  const product = document.getElementById('newProduct').value.trim().toUpperCase();
+  const tip = document.getElementById('newType').value.trim().toUpperCase();
+  const fiyat = parseFloat(document.getElementById('newPrice').value) || 0;
+  if (!product || !tip) { alert('Ürün adı ve tip zorunludur.'); return; }
+  if (!PRICE_DB[product]) PRICE_DB[product] = {};
+  PRICE_DB[product][tip] = fiyat;
+  savePrices();
+  document.getElementById('newProduct').value = '';
+  document.getElementById('newType').value = '';
+  document.getElementById('newPrice').value = '';
+  renderPriceEditor();
+  refreshAllTipSelects();
+  alert(`"${product} - ${tip}" eklendi.`);
+}
+
+function refreshAllTipSelects() {
+  // Hesap tabındaki tüm açık satırların tip seçeneklerini güncelle
+  document.querySelectorAll('[id^="tip-"]').forEach(sel => {
+    const id = sel.id.replace('tip-', '');
+    const sipEl = document.getElementById('siparis-' + id);
+    if (sipEl && sipEl.value) populateTips(id, sipEl.value);
+  });
+  updateTotal();
+}
+
+// Başlangıç
+loadDefaultRows();
+document.getElementById('stickyTotal').style.display = 'flex';
+updateTotal();
+</script>
+</body>
+</html>
