@@ -154,34 +154,38 @@
 
 <script>
 const DEFAULT_PRICES = {
-  "BACA DİRSEĞİ":       { "90 DERECE": 1000, "45 DERECE": 1000, "YOK": 0 },
-  "BACA UZATMASI":       { "1 METRE": 1000, "50 CM": 750, "YOK": 0 },
-  "CAM MENFEZ":          { "VAR": 250, "YOK": 0 },
-  "DOĞALGAZ TESİSATI":   { "ÇELİK_BORU": 4000, "ESNEK_BORU": 8000 },
-  "ELEKTİRİK TESİSATI":  { "VAR": 250, "YOK": 0 },
-  "EXTRA İŞÇİLİK":       { "VAR": 1000, "YOK": 0 },
-  "FİRMA GİDERİ":        { "VAR": 1000, "YOK": 0 },
-  "HAVLUPAN":            { "BEYAZ": 750, "KROM": 750 },
-  "İŞÇİLİK":             { "KOMPLE": 7000, "MONTAJ": 5000, "KOMBİ + GAZ": 4000 },
-  "KALORİFER TESİSATI":  { "KOMPLE": 5000, "ÖTELEME": 2500, "HAZIR": 0 },
+  "BACA DİRSEĞİ":       { "90 DERECE": 2500, "45 DERECE": 1500, "YOK": 0 },
+  "BACA UZATMASI":       { "1 METRE": 2500, "50 CM": 1500, "YOK": 0 },
+  "CAM MENFEZ":          { "VAR": 500, "YOK": 0 },
+  "DOĞALGAZ TESİSATI":   { "ÇELİK_BORU": 9500, "ESNEK_BORU": 12500 },
+  "ELEKTİRİK TESİSATI":  { "VAR": 500, "YOK": 0 },
+  "EXTRA İŞÇİLİK":       { "VAR": 2000, "YOK": 0 },
+  "FİRMA GİDERİ":        { "VAR": 2000, "YOK": 0 },
+  "HAVLUPAN":            { "BEYAZ": 1000, "KROM": 750 },
+  "İŞÇİLİK":             { "KOMPLE": 13500, "MONTAJ": 7500, "KOMBİ + GAZ": 6000 },
+  "KALORİFER TESİSATI":  { "VAR": 6000, "ÖTELEME": 3000, "HAZIR": 0 },
   "KOMBİ": {
-    "AİRFELL_MAESTRO_OPTİMUM_20kW": 22000,
-    "AİRFELL_MAESTRO_OPTİMUM_23kW": 24000,
-    "BOSCH_CONDENCE1200İ_20kW": 25500,
-    "BOSCH_CONDENCE2200İ_20kW": 27000,
-    "BOSCH_CONDENCE1200İ_24kW": 27000,
-    "ECA_CİTİUS_24kW": 25000,
-    "ECA_PROTEUS_PREMİX_24kW": 30000
+    "AİRFELL_MAESTRO_OPTİMUM_20kW": 24000,
+    "AİRFELL_MAESTRO_OPTİMUM_23kW": 25000,
+    "BOSCH_CONDENCE1200İ_20kW": 30000,
+    "BOSCH_CONDENCE1200İ_24kW": 32000,
+    "BOSCH_CONDENCE2200İ_20kW": 32000,
+    "ECA CİTİUS 20kW": 26000,
+    "ECA_CİTİUS_24kW": 28000,
+    "ECA_PROTEUS_PREMİX_24kW": 37500,
+    "DEMİRDÖKÜM ADEMİX 18kW": 26000,
+    "DEMİRDÖKÜM ADEMİX 24kW": 28000,
   },
   "KOMBİ DOLABI":        { "VAR": 1000, "YOK": 0 },
   "ODA TERMOSTATI": {
-    "AİRFELL_KABLOSUZ_TERMOSTAT": 1000,
-    "BOSCH_KABLOSUZ_TERMOSTAT": 1500,
-    "ECA_KABLOSUZ_TERMOSTAT": 1500,
+    "AİRFELL_KABLOSUZ_TERMOSTAT": 2500,
+    "BOSCH_KABLOSUZ_TERMOSTAT": 2500,
+    "ECA_KABLOSUZ_TERMOSTAT": 2500,
+    "DEMİRDÖKÜM_KABLOSUZ_TERMOSTAT": 2500,
     "YOK": 0
   },
-  "RADYATÖR":            { "ECA": 2250, "WARMHAUS": 1850 },
-  "RADYATÖR VANASI":     { "KALDE": 105, "ECA": 190 }
+  "RADYATÖR":            { "ECA": 2650, "WARMHAUS": 2250 },
+  "RADYATÖR VANASI":     { "KALDE": 205, "ECA": 450 }
 };
 
 // 1. sayfadaki sıra (müşteri hesap tablosundaki sıra)
