@@ -268,6 +268,15 @@
   ::-webkit-scrollbar-thumb { background: rgba(56,189,248,0.2); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: rgba(56,189,248,0.4); }
 
+  /* === SAFE AREA TOP COVER === */
+  #safeTop {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: env(safe-area-inset-top);
+    background: rgba(15,23,42,0.95);
+    z-index: 200;
+  }
+  body.light #safeTop { background: rgba(255,255,255,0.95); }
+
   /* === THEME TOGGLE === */
   .theme-toggle {
     position: absolute; top: 14px; right: 16px;
@@ -343,6 +352,7 @@
 </head>
 <body>
 
+<div id="safeTop"></div>
 <header style="position:relative;">
   <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Tema Değiştir">🌙</button>
   <h1>Keşif Fiyat Hesaplama</h1>
