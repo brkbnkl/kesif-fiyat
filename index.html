@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#ffffff" id="themeColor">
+<meta name="theme-color" content="#0f172a" id="themeColor">
 <script>
 (function(){
   var isDark = localStorage.getItem('kesifTheme') === 'dark';
-  var c = isDark ? '#0f172a' : '#ffffff';
-  document.documentElement.style.background = c;
-  document.getElementById('themeColor').content = c;
+  if (!isDark) {
+    document.getElementById('themeColor').content = '#ffffff';
+    document.documentElement.style.background = '#ffffff';
+  }
 })();
 </script>
 <title>Keşif Fiyat Hesaplama</title>
@@ -773,7 +774,7 @@ function refreshAllTipSelects() {
 function toggleTheme() {
   const isDark = localStorage.getItem('kesifTheme') === 'dark';
   localStorage.setItem('kesifTheme', isDark ? 'light' : 'dark');
-  location.reload();
+  location.replace(location.href);
 }
 
 function loadTheme() {
