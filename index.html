@@ -617,8 +617,14 @@ function resetAll() {
   }
 }
 
+const DEFAULT_TIPS = {
+  "BACA DİRSEĞİ":  "YOK",
+  "CAM MENFEZ":    "YOK",
+  "EXTRA İŞÇİLİK": "YOK"
+};
+
 function loadDefaultRows() {
-  DEFAULT_ORDER.forEach(p => addRow(p));
+  DEFAULT_ORDER.forEach(p => addRow(p, DEFAULT_TIPS[p] || null));
 }
 
 function saveRows() {
