@@ -19,6 +19,7 @@
     background: linear-gradient(160deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
     color: #e2e8f0; padding-bottom: 156px; min-height: 100vh;
     background-attachment: fixed;
+    color-scheme: dark;
   }
 
   /* === HEADER === */
@@ -276,7 +277,7 @@
     background: rgba(15,23,42,0.95);
     z-index: 200;
   }
-  body.light #safeTop { background: rgba(255,255,255,0.95); }
+  body.light #safeTop { background: #ffffff; }
 
   /* === THEME TOGGLE === */
   .theme-toggle {
@@ -292,6 +293,7 @@
   body.light {
     background: linear-gradient(160deg, #f0f4f8 0%, #e2e8f0 50%, #f0f4f8 100%);
     color: #1e293b;
+    color-scheme: light;
   }
   body.light header {
     background: rgba(255,255,255,0.85);
@@ -766,8 +768,8 @@ function toggleTheme() {
   body.classList.toggle('light');
   const isLight = body.classList.contains('light');
   btn.textContent = isLight ? '☀️' : '🌙';
-  document.documentElement.style.background = isLight ? '#f0f4f8' : '#0f172a';
-  document.getElementById('themeColor').content = isLight ? '#f0f4f8' : '#0f172a';
+  document.documentElement.style.background = isLight ? '#ffffff' : '#0f172a';
+  document.getElementById('themeColor').content = isLight ? '#ffffff' : '#0f172a';
   localStorage.setItem('kesifTheme', isLight ? 'light' : 'dark');
 }
 
@@ -776,8 +778,8 @@ function loadTheme() {
   if (saved === 'light') {
     document.body.classList.add('light');
     document.getElementById('themeToggle').textContent = '☀️';
-    document.documentElement.style.background = '#f0f4f8';
-    document.getElementById('themeColor').content = '#f0f4f8';
+    document.documentElement.style.background = '#ffffff';
+    document.getElementById('themeColor').content = '#ffffff';
   }
 }
 
