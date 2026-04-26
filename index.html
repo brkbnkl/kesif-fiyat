@@ -13,6 +13,7 @@
   @keyframes pulse-glow { 0%,100% { box-shadow: 0 0 8px rgba(56,189,248,0.2); } 50% { box-shadow: 0 0 18px rgba(56,189,248,0.45); } }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { background: #0f172a; }
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background: linear-gradient(160deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
@@ -765,6 +766,7 @@ function toggleTheme() {
   body.classList.toggle('light');
   const isLight = body.classList.contains('light');
   btn.textContent = isLight ? '☀️' : '🌙';
+  document.documentElement.style.background = isLight ? '#f0f4f8' : '#0f172a';
   document.getElementById('themeColor').content = isLight ? '#f0f4f8' : '#0f172a';
   localStorage.setItem('kesifTheme', isLight ? 'light' : 'dark');
 }
@@ -774,6 +776,7 @@ function loadTheme() {
   if (saved === 'light') {
     document.body.classList.add('light');
     document.getElementById('themeToggle').textContent = '☀️';
+    document.documentElement.style.background = '#f0f4f8';
     document.getElementById('themeColor').content = '#f0f4f8';
   }
 }
