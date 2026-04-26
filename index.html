@@ -478,6 +478,7 @@ function savePrices() {
 
 let PRICE_DB = loadPrices();
 let rowCounter = 0;
+let isLoading = false;
 
 // ===== TAB SWITCH =====
 function switchTab(name, btn) {
@@ -490,7 +491,7 @@ function switchTab(name, btn) {
 }
 
 // ===== HESAP TAB =====
-function addRow(productName) {
+function addRow(productName, savedTip, savedAdet) {
   rowCounter++;
   const id = rowCounter;
   const list = document.getElementById('itemsList');
@@ -502,6 +503,8 @@ function addRow(productName) {
   const productOpts = products.map(p =>
     `<option value="${p}" ${p === productName ? 'selected' : ''}>${p}</option>`
   ).join('');
+
+  const adetVal = savedAdet !== undefined ? savedAdet : 1;
 
   div.innerHTML = `
     <span class="row-number">${id}</span>
@@ -518,7 +521,7 @@ function addRow(productName) {
         </select>
       </div>
       <div class="field-adet">
-        <input type="number" id="adet-${id}" value="1" min="0" step="1" oninput="calcRow(${id})" placeholder="Adet">
+        <input type="number" id="adet-${id}" value="${adetVal}" min="0" step="1" oninput="calcRow(${id})" placeholder="Adet">
       </div>
     </div>
     <div class="price-row">
@@ -528,7 +531,7 @@ function addRow(productName) {
   `;
   list.appendChild(div);
 
-  if (productName) populateTips(id, productName);
+  if (productName) populateTips(id, productName, savedTip);
 }
 
 function onProductChange(id) {
@@ -539,7 +542,7 @@ function onProductChange(id) {
   calcRow(id);
 }
 
-function populateTips(id, product) {
+function populateTips(id, product, savedTip) {
   const tipSel = document.getElementById('tip-' + id);
   tipSel.innerHTML = '<option value="">-- Tip --</option>';
   if (product && PRICE_DB[product]) {
@@ -551,9 +554,9 @@ function populateTips(id, product) {
       tipSel.appendChild(opt);
     });
     tipSel.disabled = false;
-    // İlk tipi otomatik seç
-    if (keys.length > 0) {
-      tipSel.value = keys[0];
+    const targetTip = (savedTip && keys.includes(savedTip)) ? savedTip : keys[0];
+    if (targetTip) {
+      tipSel.value = targetTip;
       calcRow(id);
     }
   } else {
@@ -601,12 +604,14 @@ function updateTotal() {
   document.getElementById('pSenet12').textContent = formatMoney(nakit * 1.12) + ' ₺';
   document.getElementById('pSenet15').textContent = formatMoney(nakit * 1.15) + ' ₺';
   document.getElementById('pSenet18').textContent = formatMoney(nakit * 1.18) + ' ₺';
+  saveRows();
 }
 
 function resetAll() {
   if (confirm('Tüm kalemleri sıfırlamak istediğinize emin misiniz?')) {
     document.getElementById('itemsList').innerHTML = '';
     rowCounter = 0;
+    localStorage.removeItem('kesifRows');
     loadDefaultRows();
     updateTotal();
   }
@@ -614,6 +619,37 @@ function resetAll() {
 
 function loadDefaultRows() {
   DEFAULT_ORDER.forEach(p => addRow(p));
+}
+
+function saveRows() {
+  if (isLoading) return;
+  const rows = [];
+  document.querySelectorAll('[id^="row-"]').forEach(rowEl => {
+    const id = rowEl.id.replace('row-', '');
+    const sipEl = document.getElementById('siparis-' + id);
+    const tipEl = document.getElementById('tip-' + id);
+    const adetEl = document.getElementById('adet-' + id);
+    if (sipEl && tipEl && adetEl) {
+      rows.push({ product: sipEl.value, tip: tipEl.value, adet: adetEl.value });
+    }
+  });
+  localStorage.setItem('kesifRows', JSON.stringify(rows));
+}
+
+function loadSavedRows() {
+  try {
+    const saved = localStorage.getItem('kesifRows');
+    if (!saved) { loadDefaultRows(); return; }
+    const rows = JSON.parse(saved);
+    if (!rows || rows.length === 0) { loadDefaultRows(); return; }
+    isLoading = true;
+    rows.forEach(r => addRow(r.product || null, r.tip || null, parseFloat(r.adet) || 1));
+    isLoading = false;
+    updateTotal();
+  } catch(e) {
+    isLoading = false;
+    loadDefaultRows();
+  }
 }
 
 function formatMoney(n) {
@@ -724,9 +760,8 @@ function loadTheme() {
 
 // Başlangıç
 loadTheme();
-loadDefaultRows();
+loadSavedRows();
 document.getElementById('stickyTotal').style.display = 'flex';
-updateTotal();
 </script>
 </body>
 </html>
