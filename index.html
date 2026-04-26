@@ -3,14 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff" id="themeColor">
 <script>
 (function(){
-  var isLight = localStorage.getItem('kesifTheme') !== 'dark';
-  var c = isLight ? '#ffffff' : '#0f172a';
+  var isDark = localStorage.getItem('kesifTheme') === 'dark';
+  var c = isDark ? '#0f172a' : '#ffffff';
   document.documentElement.style.background = c;
-  var m = document.createElement('meta');
-  m.name = 'theme-color'; m.id = 'themeColor'; m.content = c;
-  document.head.appendChild(m);
+  document.getElementById('themeColor').content = c;
 })();
 </script>
 <title>Keşif Fiyat Hesaplama</title>
