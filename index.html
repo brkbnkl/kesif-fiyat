@@ -3,7 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0f172a" id="themeColor">
+<script>
+(function(){
+  var isLight = localStorage.getItem('kesifTheme') === 'light';
+  var c = isLight ? '#ffffff' : '#0f172a';
+  document.documentElement.style.background = c;
+  var m = document.createElement('meta');
+  m.name = 'theme-color'; m.id = 'themeColor'; m.content = c;
+  document.head.appendChild(m);
+  if (isLight) document.documentElement.classList.add('pre-light');
+})();
+</script>
 <title>Keşif Fiyat Hesaplama</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
