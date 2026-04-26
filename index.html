@@ -5,13 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <script>
 (function(){
-  var isLight = localStorage.getItem('kesifTheme') === 'light';
+  var isLight = localStorage.getItem('kesifTheme') !== 'dark';
   var c = isLight ? '#ffffff' : '#0f172a';
   document.documentElement.style.background = c;
   var m = document.createElement('meta');
   m.name = 'theme-color'; m.id = 'themeColor'; m.content = c;
   document.head.appendChild(m);
-  if (isLight) document.documentElement.classList.add('pre-light');
 })();
 </script>
 <title>Keşif Fiyat Hesaplama</title>
@@ -773,23 +772,19 @@ function refreshAllTipSelects() {
 
 // ===== TEMA =====
 function toggleTheme() {
-  const body = document.body;
-  const btn = document.getElementById('themeToggle');
-  body.classList.toggle('light');
-  const isLight = body.classList.contains('light');
-  btn.textContent = isLight ? '☀️' : '🌙';
-  document.documentElement.style.background = isLight ? '#ffffff' : '#0f172a';
-  document.getElementById('themeColor').content = isLight ? '#ffffff' : '#0f172a';
-  localStorage.setItem('kesifTheme', isLight ? 'light' : 'dark');
+  const isDark = localStorage.getItem('kesifTheme') === 'dark';
+  localStorage.setItem('kesifTheme', isDark ? 'light' : 'dark');
+  location.reload();
 }
 
 function loadTheme() {
-  const saved = localStorage.getItem('kesifTheme');
-  if (saved === 'light') {
+  const isDark = localStorage.getItem('kesifTheme') === 'dark';
+  if (isDark) {
+    document.body.classList.remove('light');
+    document.getElementById('themeToggle').textContent = '🌙';
+  } else {
     document.body.classList.add('light');
     document.getElementById('themeToggle').textContent = '☀️';
-    document.documentElement.style.background = '#ffffff';
-    document.getElementById('themeColor').content = '#ffffff';
   }
 }
 
